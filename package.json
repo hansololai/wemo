@@ -1,0 +1,26 @@
+{
+  "name": "wemo",
+  "private": false,
+  "version": "0.0.0",
+  "description": "Wemo service bridge with Amazon Echo",
+  "keywords": [],
+  "dependencies": {
+    "uuid4":"*",
+    "lodash":"*",
+    "node-ssdp":"*",
+  },
+  "scripts": {
+    "start": "node index.js",
+    "debug": "node debug index.js"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nickrechard/wemo/archive/master.zip"
+  },
+  "author": "han",
+  "license": "MIT",
+  "devDependencies": {
+    
+  }
+}

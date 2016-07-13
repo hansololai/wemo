@@ -1,4 +1,5 @@
 var uuid=require('uuid4');
+var _=require('lodash');
 var XML_TEMPLATE=function(name,device_serial){
 	return "<?xml version=\"1.0\"?> \
 <root>\
@@ -14,7 +15,7 @@ var XML_TEMPLATE=function(name,device_serial){
 }
 
 
-_=require('lodash');
+
 var Device=function(options){
 	this.name=options.name;
 	this.port=options.port ||0 ;
