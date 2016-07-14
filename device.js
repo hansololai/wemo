@@ -44,36 +44,49 @@ var Device=function(options){
 	}
 
 	var self=this;
-	this.httpServer=require('http').createServer((req,res)=>{
-		console.log("received request ", req.url)
-		if (req.url.indexOf("/setup.xml")==0){
-			// Return the xml file
-			res.writeHead(200,{
-				"CONTENT-TYPE":"text/xml",
-				"SERVER":"Unspecified, UPnP/1.0, Unspecified"
-			})
-			console.log("writing response");
-			res.write(XML_TEMPLATE(self.name,self.serial))
-			res.end();
-			
-		}else if(req.headers["soapaction"]=="\"urn:Belkin:service:basicevent:1#SetBinaryState\""){
-			console.log("control");
-			if (req.body.indexOf("<BinaryState>1</BinaryState>")){
-				// Turn on. TODO: use XML parser
-				self.actionHandler['on'];
-				res.writeHead(200,defaultResposneHead())
-			}else if(req.body.indexOf("<BinaryState>0</BinaryState>")){
-				// Trun off
-				self.actionHandler['off'];
-				res.writeHead(200,defaultResposneHead())
+	this.httpServer=require('http').createServer((request,res)=>{
+		var body=[];
+		var headers = request.headers;
+		var method = request.method;
+		var url = request.url;
+		request.on('error', function(err) {
+			console.error(err);
+		}).on('data', function(chunk) {
+			body.push(chunk);
+		}).on('end', function() {
+			body = Buffer.concat(body).toString();
+		// At this point, we have the headers, method, url and body, and can now
+		// do whatever we need to in order to respond to this request.
+			if (url.indexOf("/setup.xml")==0){
+				// Return the xml file
+				res.writeHead(200,{
+					"CONTENT-TYPE":"text/xml",
+					"SERVER":"Unspecified, UPnP/1.0, Unspecified"
+				})
+				console.log("writing response");
+				res.write(XML_TEMPLATE(self.name,self.serial))
+				res.end();
+				
+			}else if(headers["soapaction"]=="\"urn:Belkin:service:basicevent:1#SetBinaryState\""){
+				console.log("control");
+				if (body.indexOf("<BinaryState>1</BinaryState>")){
+					// Turn on. TODO: use XML parser
+					console.log(self.actionHandler['on']());
+					res.writeHead(200,defaultResposneHead())
+				}else if(body.indexOf("<BinaryState>0</BinaryState>")){
+					// Trun off
+					console.log(self.actionHandler['off']());
+					res.writeHead(200,defaultResposneHead())
+				}else{
+					res.writeHead(404,defaultResposneHead())
+				}
+				res.end();
 			}else{
-				res.writeHead(404,defaultResposneHead())
+				res.writeHead(200,defaultResposneHead())
+				res.end();
 			}
-			res.end();
-		}else{
-			res.writeHead(200,defaultResposneHead())
-			res.end();
-		}
+
+		});
 	});
 	
 }

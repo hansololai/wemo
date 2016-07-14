@@ -7,7 +7,7 @@
   "dependencies": {
     "uuid4":"*",
     "lodash":"*",
-    "node-ssdp":"*",
+    "node-ssdp":"*"
   },
   "scripts": {
     "start": "node index.js",
