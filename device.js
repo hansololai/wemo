@@ -14,7 +14,16 @@ var XML_TEMPLATE=function(name,device_serial){
 </root>"
 }
 
-
+var defaultResposneHead=function(){
+			   return {"CONTENT-LENGTH": 0,
+               "CONTENT-TYPE": "text/xml charset=\"utf-8\"",
+               "DATE": new Date().toUTCString(),
+               "EXT":"",
+               "SERVER": "Unspecified, UPnP/1.0, Unspecified",
+               "X-User-Agent": "redsonic",
+               "CONNECTION": "close"
+           }
+		}
 
 var Device=function(options){
 	this.name=options.name;
@@ -36,7 +45,7 @@ var Device=function(options){
 
 	var self=this;
 	this.httpServer=require('http').createServer((req,res)=>{
-		console.log("received request ", req.url);
+		console.log("received request ", req.url)
 		if (req.url.indexOf("/setup.xml")==0){
 			// Return the xml file
 			res.writeHead(200,{
@@ -49,28 +58,20 @@ var Device=function(options){
 			
 		}else if(req.headers["soapaction"]=="\"urn:Belkin:service:basicevent:1#SetBinaryState\""){
 			console.log("control");
-			res.writeHead(200,{
-			   "CONTENT-LENGTH": 0,
-               "CONTENT-TYPE": "text/xml charset=\"utf-8\"",
-               "DATE": new Date().toUTCString(),
-               "EXT":"",
-               "SERVER": "Unspecified, UPnP/1.0, Unspecified",
-               "X-User-Agent": "redsonic",
-               "CONNECTION": "close"
-			})
+			if (req.body.indexOf("<BinaryState>1</BinaryState>")){
+				// Turn on. TODO: use XML parser
+				self.actionHandler['on'];
+				res.writeHead(200,defaultResposneHead())
+			}else if(req.body.indexOf("<BinaryState>0</BinaryState>")){
+				// Trun off
+				self.actionHandler['off'];
+				res.writeHead(200,defaultResposneHead())
+			}else{
+				res.writeHead(404,defaultResposneHead())
+			}
 			res.end();
 		}else{
-			res.writeHead(200,{
-			   "CONTENT-LENGTH": 0,
-               "CONTENT-TYPE": "text/xml charset=\"utf-8\"",
-               "DATE": new Date().toUTCString(),
-               "EXT":"",
-               "SERVER": "Unspecified, UPnP/1.0, Unspecified",
-               "X-User-Agent": "redsonic",
-               "CONNECTION": "close"
-			})
-			console.log(req.headers["soapaction"]);
-			console.log("pass")
+			res.writeHead(200,defaultResposneHead())
 			res.end();
 		}
 	});

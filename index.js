@@ -73,14 +73,15 @@ Server.prototype._respondToSearch = function (serviceType, rinfo) {
   })
 }
 
- server = new Server({
-       // location:require('ip').address()+'/setup.xml',
-     });
+ server = new Server();
  server.start();
-    process.on('exit', function(){
-      server.stop() // advertise shutting down and stop listening
-    })
- var light=new Device({name:"kitchen light"});
+process.on('exit', function(){
+  server.stop() // advertise shutting down and stop listening
+})
+ var light=new Device({name:"kitchen light",actionHandler:{
+    "on":function(){console.log("kitchen light is turned on");return true},
+    "off":function(){console.log("kitchen light is turned off");return true}
+  }});
  var door=new Device({name:"door"});
  console.log(light);
  server.addDevice(light)
